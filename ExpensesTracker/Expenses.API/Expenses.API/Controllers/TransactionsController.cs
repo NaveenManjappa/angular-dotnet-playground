@@ -1,4 +1,5 @@
 ﻿using Expenses.API.Data;
+using Expenses.API.Data.Services;
 using Expenses.API.Dtos;
 using Expenses.API.Models;
 using Microsoft.AspNetCore.Http;
@@ -9,44 +10,31 @@ namespace Expenses.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TransactionsController : ControllerBase
+    public class TransactionsController(ITransactionsService transactionService) : ControllerBase
     {
-        private readonly AppDbContext appDbContext;
-
-        public TransactionsController(AppDbContext appDbContext)
-        {
-            this.appDbContext = appDbContext;
-        }        
+              
 
         [HttpPost("Create")]
         public IActionResult CreateTransaction([FromBody]PostTransactionDto transaction)
         {
-            var newTransaction = new Transaction()
-            {
-                Amount = transaction.Amount,
-                Type = transaction.Type,
-                Category = transaction.Category,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            };
-            appDbContext.Transactions.Add(newTransaction);
-            appDbContext.SaveChanges();
-            return Ok();
+           var newTransaction=transactionService.Add(transaction);
+            return newTransaction == null ? NotFound() : Ok(newTransaction);
+            
         }
 
         [HttpGet("All")]
         public IActionResult GetAll()
         {
-            var allTransactions = appDbContext.Transactions.ToList();
+            var allTransactions = transactionService.GetAll();
             return Ok(allTransactions);
         }
 
         [HttpGet("Details/{id}")]
         public IActionResult Get(int id) { 
-            var transaction = appDbContext.Transactions.SingleOrDefault(t => t.Id == id);
-            if (transaction == null) { 
+            var transaction =transactionService.GetById(id);
+            if (transaction == null) 
                 return NotFound();
-            }
+            
             return Ok(transaction);
 
         }
@@ -54,41 +42,24 @@ namespace Expenses.API.Controllers
         [HttpGet("Details")]
         public IActionResult GetNew(int id)
         {
-            var transaction = appDbContext.Transactions.SingleOrDefault(t => t.Id == id);
-            if (transaction == null)
-            {
-                return NotFound();
-            }
-            return Ok(transaction);
+            var transaction = transactionService.GetById(id);
+            return transaction == null ? NotFound() : Ok(transaction);
 
         }
 
         [HttpPut("{id}")]
         public IActionResult UpdateTransaction(int id,[FromBody]PutTransactionDto transaction)
         {
-            var transactionDb = appDbContext.Transactions.FirstOrDefault(t => t.Id == id);
-            if (transactionDb == null)
-                return NotFound();
-            transactionDb.Type = transaction.Type;
-            transactionDb.Amount = transaction.Amount;
-            transactionDb.Category = transaction.Category;
-            transactionDb.UpdatedAt = DateTime.UtcNow;
-
-            appDbContext.Transactions.Update(transactionDb);
-            appDbContext.SaveChanges();
-            return Ok(transactionDb);
+            var transactionDb = transactionService.Update(id,transaction);
+            return transactionDb == null ? NotFound() : Ok(transactionDb);
 
         }
 
         [HttpDelete("Delete/{id}")]
         public IActionResult DeleteTransaction(int id)
         { 
-            var transactionDb = appDbContext.Transactions.FirstOrDefault(t =>t.Id == id);
-            if(transactionDb == null)
-                return NotFound();
-            appDbContext.Transactions.Remove(transactionDb);
-            appDbContext.SaveChanges();
-            return Ok();
+            var transactionDb= transactionService.Delete(id);
+            return transactionDb == null ? NotFound() : Ok(transactionDb);
         }
     }
 }
