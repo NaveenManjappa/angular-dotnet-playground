@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Transaction } from '../../models/transaction';
 import { CommonModule } from '@angular/common';
+import { TransactionService } from '../../services/transaction';
 
 '@angular/common';
 
@@ -10,24 +11,29 @@ import { CommonModule } from '@angular/common';
   templateUrl: './transaction-list.html',
   styleUrl: './transaction-list.css'
 })
-export class TransactionList {
-  transactions:Transaction[] = [
-    {
-      id: 1,
-      type: 'expense',
-      category: 'Groceries',
-      amount: 50.00,
-      createdAt: new Date('2025-09-22'),
-      updatedAt: new Date('2025-09-22')
-    },
-    {
-      id: 2,
-      type: 'income',
-      category: 'Salary',
-      amount: 2000.00,
-      createdAt: new Date('2025-09-20'),
-      updatedAt: new Date('2025-09-20')
-    }
-  ];
+export class TransactionList implements OnInit {
+  
+  transactionService = inject(TransactionService);
+  transactions:Transaction[] = [];
+
+  ngOnInit(): void {
+    this.loadTransactions();
+  }
+
+  loadTransactions():void {
+    this.transactionService.getAll().subscribe(data => this.transactions=data);
+  }
+
+  getTotalIncome():number {
+    return this.transactions.filter(t => t.type === 'Income').reduce((sum,t) => sum+t.amount,0);
+  }
+
+  getTotalExpense():number {
+    return this.transactions.filter(t => t.type === 'Expense').reduce((sum,t) => sum + t.amount,0);
+  }
+
+  getNetBalance():number {
+    return this.getTotalIncome() -  this.getTotalExpense();
+  }
 }
 

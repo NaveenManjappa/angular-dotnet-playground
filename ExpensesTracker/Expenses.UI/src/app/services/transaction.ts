@@ -1,15 +1,14 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { Transaction } from '../models/transaction';
 
 @Injectable({
   providedIn: 'root'
 })
-export class Transaction {
-  private apiUrl='https://localhost:7145/api/transactions/'
-  constructor(private http:HttpClient){
-
-  }
+export class TransactionService {
+  private apiUrl='https://localhost:7141/api/transactions/'
+  http:HttpClient = inject(HttpClient);
 
   getAll():Observable<Transaction[]>{
     return this.http.get<Transaction[]>(this.apiUrl+"all");
