@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(opt => opt.AddPolicy("AllowAll", opt => opt.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin()));
 var conn = builder.Configuration.GetConnectionString("Default");
 // Add services to the container.
 builder.Services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(conn));
@@ -23,7 +24,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseCors("AllowAll");
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
