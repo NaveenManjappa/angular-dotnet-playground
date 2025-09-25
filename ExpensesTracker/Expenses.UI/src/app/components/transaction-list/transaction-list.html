@@ -4,7 +4,7 @@
       <div class="card h-100 bg-success bg-opacity-75 text-white">
         <div class="card-body">
           <h5 class="card-title">Total Income</h5>
-          <h3 class="card-text">{{getTotalIncome() | currency:'GBP'}}</h3>
+          <h3 class="card-text">{{ getTotalIncome() | currency : 'GBP' }}</h3>
         </div>
       </div>
     </div>
@@ -13,16 +13,19 @@
       <div class="card h-100 bg-danger bg-opacity-75 text-white">
         <div class="card-body">
           <h5 class="card-title">Total Expenses</h5>
-          <h3 class="card-text">{{getTotalExpense() | currency:'GBP'}}</h3>
+          <h3 class="card-text">{{ getTotalExpense() | currency : 'GBP' }}</h3>
         </div>
       </div>
     </div>
 
     <div class="col-md-4">
-      <div class="card h-100 bg-opacity-75 text-white" [ngClass]="getNetBalance() >= 0 ? 'bg-success':'bg-danger'">
+      <div
+        class="card h-100 bg-opacity-75 text-white"
+        [ngClass]="getNetBalance() >= 0 ? 'bg-success' : 'bg-danger'"
+      >
         <div class="card-body">
           <h5 class="card-title">Net Balance</h5>
-          <h3 class="card-text fw-bold">{{getNetBalance() | currency:'GBP'}}</h3>
+          <h3 class="card-text fw-bold">{{ getNetBalance() | currency : 'GBP' }}</h3>
         </div>
       </div>
     </div>
@@ -43,8 +46,10 @@
       <tbody>
         @for (transaction of transactions; track transaction) {
         <tr>
-          <td>{{ transaction.createdAt }}</td>
-          <td [ngClass]="transaction.type === 'Income' ? 'text-success' : 'text-danger'">{{ transaction.type }}</td>
+          <td>{{ transaction.createdAt | date }}</td>
+          <td [ngClass]="transaction.type === 'Income' ? 'text-success' : 'text-danger'">
+            {{ transaction.type }}
+          </td>
           <td>
             {{ transaction.category }}
           </td>

@@ -7,11 +7,11 @@ import { Transaction } from '../models/transaction';
   providedIn: 'root'
 })
 export class TransactionService {
-  private apiUrl='https://localhost:7141/api/transactions/'
+  private apiUrl='https://localhost:7141/api/Transactions'
   http:HttpClient = inject(HttpClient);
 
   getAll():Observable<Transaction[]>{
-    return this.http.get<Transaction[]>(this.apiUrl+"all");
+    return this.http.get<Transaction[]>(this.apiUrl+"/all");
   }
 
   getById(id:number):Observable<Transaction>{
