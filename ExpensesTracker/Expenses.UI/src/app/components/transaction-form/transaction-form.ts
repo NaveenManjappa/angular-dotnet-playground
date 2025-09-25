@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TransactionService } from '../../services/transaction';
 
 @Component({
@@ -20,13 +20,17 @@ export class TransactionForm implements OnInit{
   expenseCategories = [
     'Food',
     'Transportation',
-    'Entertainment'
+    'Entertainment',
+    'Car'
   ];
 
   availableCategories:string[] = [];
+  editMode=false;
+  transactionId?:number;
 
   fb:FormBuilder = inject(FormBuilder);
   router:Router=inject(Router);
+  activatedRoute:ActivatedRoute=inject(ActivatedRoute);
   transactionService:TransactionService = inject(TransactionService);
   
   constructor(){
@@ -38,7 +42,14 @@ export class TransactionForm implements OnInit{
     });
   }
   ngOnInit(): void {
-    this.updateAllAvailableCategories();
+     this.updateAllAvailableCategories(this.transactionForm.get('type')?.value);
+    const id = this.activatedRoute.snapshot.paramMap.get("id");
+    if(id){
+      this.editMode =true;
+      this.transactionId = +id;
+      this.loadTransaction(this.transactionId);
+    }
+   
     
   }
 
@@ -50,20 +61,57 @@ export class TransactionForm implements OnInit{
     if(this.transactionForm.valid){
       const transaction = this.transactionForm.value;
       console.log(transaction);
-      this.transactionService.create(transaction).subscribe(data => {
-        this.router.navigate(['/transactions']);
-      });
+      if(this.editMode && this.transactionId){
+        this.transactionService.update(this.transactionId,transaction).subscribe({
+          next:(transaction) => {
+            this.router.navigate(['/transactions'])
+          },
+          error:(error) => {
+            console.log('Error',error);
+          }
+        })
+      }
+      else {
+        this.transactionService.create(transaction).subscribe({
+          next: (transaction) => {
+            this.router.navigate(['/transactions']);
+          },
+          error: (error) => {
+            console.log('Error:', error);
+          }
+        });
+      }
+      
     }
   }
 
-  onTypeChange(){    
-    this.updateAllAvailableCategories();
+  onTypeChange(){ 
+       
+    this.updateAllAvailableCategories(this.transactionForm.get('type')?.value);
   }
 
-  updateAllAvailableCategories(){
-    const type = this.transactionForm.get('type')?.value;
+  updateAllAvailableCategories(type:string){
+    
     this.availableCategories = type === 'Expense' ? this.expenseCategories : this.incomeCategories;
     this.transactionForm.patchValue({category:''});
+  }
+
+  loadTransaction(id:number):void {
+    this.transactionService.getById(id).subscribe({
+      next:(transaction) =>{
+        console.log('load',transaction);
+        this.updateAllAvailableCategories(transaction.type);
+        this.transactionForm.patchValue({
+          type:transaction.type,
+          category:transaction.category,
+          amount:transaction.amount
+        });
+        
+      },
+      error:(error) => {
+        console.log('Error:',error);
+      }
+    })
   }
 
 }

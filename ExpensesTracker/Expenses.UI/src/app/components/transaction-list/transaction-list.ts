@@ -2,6 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { Transaction } from '../../models/transaction';
 import { CommonModule } from '@angular/common';
 import { TransactionService } from '../../services/transaction';
+import { Router } from '@angular/router';
 
 '@angular/common';
 
@@ -14,7 +15,9 @@ import { TransactionService } from '../../services/transaction';
 export class TransactionList implements OnInit {
   
   transactionService = inject(TransactionService);
-  transactions:Transaction[] = [];
+  router:Router=inject(Router);
+
+  transactions:Transaction[] = [];  
 
   ngOnInit(): void {
     this.loadTransactions();
@@ -34,6 +37,12 @@ export class TransactionList implements OnInit {
 
   getNetBalance():number {
     return this.getTotalIncome() -  this.getTotalExpense();
+  }
+
+  editTransaction(transaction:Transaction){
+    if(transaction.id){
+      this.router.navigate(['/edit',transaction.id])
+    }
   }
 }
 

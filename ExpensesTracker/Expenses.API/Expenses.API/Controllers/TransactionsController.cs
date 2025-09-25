@@ -49,7 +49,7 @@ namespace Expenses.API.Controllers
 
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("Update/{id}")]
         public IActionResult UpdateTransaction(int id,[FromBody]PutTransactionDto transaction)
         {
             var transactionDb = transactionService.Update(id,transaction);

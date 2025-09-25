@@ -3,7 +3,7 @@
     <div class="col-md-8 col-lg-6">
       <div class="card shadow-sm">
         <div class="card-header bg-light py-3">
-          <h3 class="card-title mb-0 fw-semibold">Add Transaction</h3>
+          <h3 class="card-title mb-0 fw-semibold">{{ editMode ? 'Edit' : 'Add' }} Transaction</h3>
         </div>
         <div class="card-body p-4">
           <form [formGroup]="transactionForm" (ngSubmit)="onSubmit()">
@@ -58,7 +58,7 @@
                 class="btn btn-primary btn-lg px-4"
                 [disabled]="!transactionForm.valid"
               >
-                Add Transaction
+                {{ editMode ? 'Update' : 'Save' }} Transaction
               </button>
             </div>
           </form>
