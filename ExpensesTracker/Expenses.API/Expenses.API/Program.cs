@@ -1,6 +1,8 @@
 using Expenses.API.Data;
 using Expenses.API.Data.Services;
+using Expenses.API.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -35,6 +37,7 @@ builder.Services.AddSwaggerGen();
 
 //Dependency injection
 builder.Services.AddScoped<ITransactionsService,TransactionsService>();
+builder.Services.AddScoped<PasswordHasher<User>>();
 
 var app = builder.Build();
 

@@ -4,6 +4,7 @@ using Expenses.API.Models;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -15,22 +16,45 @@ namespace Expenses.API.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [EnableCors("AllowAll")]
-    public class AuthController(AppDbContext appDbContext) : ControllerBase
+    public class AuthController(AppDbContext appDbContext,PasswordHasher<User> passwordHasher) : ControllerBase
     {
         [HttpPost("register")]
         public IActionResult Register([FromBody] PostUserDto userProfile)
         {
             if (appDbContext.Users.Any(u => u.Email == userProfile.Email))
                 return BadRequest("This email address is already taken");
-            
-            var newUser = new User { Email = userProfile.Email,Password=userProfile.Password,CreatedAt=DateTime.UtcNow,UpdatedAt=DateTime.UtcNow };
+
+            var newUser = new User
+            {
+                Email = userProfile.Email,
+                Password = passwordHasher.HashPassword(null, userProfile.Password),
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
 
             appDbContext.Users.Add(newUser);
             appDbContext.SaveChanges();
             var token = GenerateToken(newUser);
 
-            return Ok(new { Token=token});
+            return Ok(new { Token = token});
 
+        }
+
+        [HttpPost("login")]
+        public IActionResult Login([FromBody] LoginUserDto loginUser)
+        {
+            var user = appDbContext.Users.FirstOrDefault(u => u.Email == loginUser.Email);
+
+            if (user == null)
+                return Unauthorized("Invalid credentials");
+
+            var result = passwordHasher.VerifyHashedPassword(user,user.Password,loginUser.Password);
+
+            if (result == PasswordVerificationResult.Failed)
+                return Unauthorized("Invalid credentials");
+
+            var token = GenerateToken(user);
+            return Ok(new { Token = token });
         }
 
         private string GenerateToken(User user)
