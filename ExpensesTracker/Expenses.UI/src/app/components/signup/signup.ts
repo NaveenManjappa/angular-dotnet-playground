@@ -13,6 +13,8 @@ import { AuthService } from '../../services/auth';
 })
 export class Signup {
   signUpForm:FormGroup;
+  errorMsg:string | null = null;
+
   fb:FormBuilder=inject(FormBuilder);
   authService:AuthService = inject(AuthService);
   router:Router = inject(Router);
@@ -21,14 +23,21 @@ export class Signup {
     this.signUpForm = this.fb.group({
       email: ['',[Validators.required,Validators.email]],
       password:['',[Validators.required,Validators.minLength(6)]],
-      confirmPassword:['',[Validators.required,Validators.minLength(6)]],
-      validators: this.passwordMatchValidator
-    });
+      confirmPassword:['',[Validators.required,Validators.minLength(6)]]      
+    },
+  {
+    validators: this.passwordMatchValidator
+  });
     
   }
 
+  hasError(controlName:string,errorName:string):boolean {
+    const control = this.signUpForm.get(controlName);
+    return (control?.touched || control?.dirty) && control.hasError(errorName) || false;
+  }
   onSubmit():void{
     console.log(this.signUpForm.value);
+    this.errorMsg=null;
     if(this.signUpForm.valid){
       this.authService.register(this.signUpForm.value)
       .subscribe({
@@ -37,6 +46,7 @@ export class Signup {
         },
         error:(error) => {
           console.log('Error',error);
+          this.errorMsg=error.error || 'An error occured during the sign up. Please try again'
         }
       })
     }
