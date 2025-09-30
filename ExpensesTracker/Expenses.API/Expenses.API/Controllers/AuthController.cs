@@ -62,8 +62,7 @@ namespace Expenses.API.Controllers
             var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier,user.Id.ToString()),
-                new Claim(ClaimTypes.Email,user.Email),
-                new Claim(ClaimTypes.Name,user.Password)
+                new Claim(ClaimTypes.Email,user.Email)
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("this-is-a-very-long-lenghty-complex-hard-to-guess-and-secured-key-"));
