@@ -10,3 +10,5 @@
 /ExpensesTracker/Expenses.API/Expenses.API/obj
 ExpensesTracker/Expenses.UI/.github/copilot-instructions.md
 /ExpensesTracker/Expenses.API/Expenses.API/appsettings.Development.json
+ExpensesTracker/Expenses.API/Expenses.API/bin/
+ExpensesTracker/Expenses.API/Expenses.API/Properties/
